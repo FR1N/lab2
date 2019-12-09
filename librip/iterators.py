@@ -1,17 +1,36 @@
+from types import GeneratorType
+
+
 # Итератор для удаления дубликатов
 class Unique(object):
+    ignore_case = False
+    current_list = []
+    current = 0
+
     def __init__(self, items, **kwargs):
-        # Нужно реализовать конструктор
-        # В качестве ключевого аргумента, конструктор должен принимать bool-параметр ignore_case,
-        # в зависимости от значения которого будут считаться одинаковые строки в разном регистре
-        # Например: ignore_case = True, Aбв и АБВ разные строки
-        #           ignore_case = False, Aбв и АБВ одинаковые строки, одна из них удалится
-        # По-умолчанию ignore_case = False
-        pass
+        if 'ignore_case' in kwargs.keys():
+            self.ignore_case = kwargs['ignore_case']
+            self.items = items
+        if type(items) == GeneratorType:
+            self.items = list(items)
+        else:
+            self.items = items
 
     def __next__(self):
-        # Нужно реализовать __next__    
-        pass
+        if self.current != len(self.items):
+            a = self.items[self.current]
+            self.current += 1
+            if self.ignore_case:
+                a = a.lower()
+            if a not in self.current_list:
+                self.current_list.append(a)
+                return a
+            else:
+                return next(self)
+        else:
+            raise StopIteration
 
     def __iter__(self):
+        del self.current_list[:]
+        self.current = 0
         return self
